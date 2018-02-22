@@ -9,6 +9,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
+	//"k8s.io/api/core/v1"
 )
 
 func main() {
@@ -31,12 +32,33 @@ func main() {
 
 		fmt.Printf("Timestamp: %d", time.Now())
 		fmt.Printf("There are %d pods in the cluster\n", len(pods.Items))
+
+
+
+		namespaces, namespacesErr := clientset.CoreV1().Namespaces().List(metav1.ListOptions{})
+
+		if namespacesErr != nil {
+			fmt.Printf("		Error: %v", namespacesErr)
+		}
+
+		for _, namespace := range namespaces.Items {
+
+			fmt.Printf("		Namespace: %v", namespace.Name)
+
+			pods, podsErr := clientset.CoreV1().Pods(namespace.Name).List(metav1.ListOptions{})
+
+			if podsErr != nil {
+				fmt.Printf("			Error: %v", namespacesErr)
+			}
+
+			for _, pod := range pods.Items {
+				fmt.Printf("			Pod: %v, ", pod.Name)
+			}
+		}
+
+
 		fmt.Printf("----------------------------------------------------")
 
-		// Examples for error handling:
-		// - Use helper functions like e.g. errors.IsNotFound()
-		// - And/or cast to StatusError and use its properties like e.g. ErrStatus.Message
-		_, err = clientset.CoreV1().Pods("default").Get("example-xxxxx", metav1.GetOptions{})
 		if errors.IsNotFound(err) {
 			fmt.Printf("Pod not found\n")
 		} else if statusError, isStatus := err.(*errors.StatusError); isStatus {
