@@ -28,8 +28,10 @@ func main() {
 		if err != nil {
 			panic(err.Error())
 		}
+
 		fmt.Printf("Timestamp: %d", time.Now())
 		fmt.Printf("There are %d pods in the cluster\n", len(pods.Items))
+		fmt.Printf("----------------------------------------------------")
 
 		// Examples for error handling:
 		// - Use helper functions like e.g. errors.IsNotFound()
