@@ -30,32 +30,33 @@ func main() {
 			panic(err.Error())
 		}
 
-		fmt.Printf("Timestamp: %d", time.Now())
+		fmt.Printf("Timestamp: %d\n", time.Now())
 		fmt.Printf("There are %d pods in the cluster\n", len(pods.Items))
-
-
 
 		namespaces, namespacesErr := clientset.CoreV1().Namespaces().List(metav1.ListOptions{})
 
 		if namespacesErr != nil {
-			fmt.Printf("		Error: %v", namespacesErr)
-		}
+			fmt.Printf("\tError while getting namespaces: %v\n", namespacesErr)
+		} else {
 
-		for _, namespace := range namespaces.Items {
+			fmt.Printf("Pods list\n")
 
-			fmt.Printf("		Namespace: %v", namespace.Name)
+			for _, namespace := range namespaces.Items {
 
-			pods, podsErr := clientset.CoreV1().Pods(namespace.Name).List(metav1.ListOptions{})
+				fmt.Printf("\tNamespace: %v\n", namespace.Name)
 
-			if podsErr != nil {
-				fmt.Printf("			Error: %v", namespacesErr)
+				pods, podsErr := clientset.CoreV1().Pods(namespace.Name).List(metav1.ListOptions{})
+
+				if podsErr != nil {
+					fmt.Printf("\t\tError while getting pods from: %v\n", namespacesErr)
+				} else {
+					fmt.Printf("\t\tPods in namespace: %v\n", namespace.Name)
+					for _, pod := range pods.Items {
+						fmt.Printf("\t\t%v\n", pod.Name)
+					}
+				}
 			}
-
-			for _, pod := range pods.Items {
-				fmt.Printf("			Pod: %v, ", pod.Name)
-			}
 		}
-
 
 		fmt.Printf("----------------------------------------------------")
 
